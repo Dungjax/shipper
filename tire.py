@@ -2,6 +2,7 @@ from pygame import sprite, transform
 from sprite_importer import importImage
 from pymunk import Body, Circle, Space, Vec2d
 from math import degrees
+from enums import ShapeType
 
 tireSprite = importImage("assets/tire.png").convert_alpha()
 
@@ -18,14 +19,12 @@ class Tire(sprite.Sprite):
         self.shape = Circle(self.body, radius=tireSprite.get_width() // 2)
         self.shape.elasticity = 0.25
         self.shape.friction = 10
+        self.shape.collision_type = ShapeType.TIRE.value
 
         _space.add(self.body, self.shape)
 
-        self.collisionHandle = _space.add_collision_handler(0, 0)
-        self.collisionHandle.begin = self.collsionBegin
-        self.collisionHandle.pre_solve = self.collisionPreSolve
-        self.collisionHandle.post_solve = self.collisionPostSovle
-        self.collisionHandle.separate = self.collisionSeparate
+        self.collisionHandle = _space.add_collision_handler(ShapeType.TIRE.value, ShapeType.GROUND.value)
+        self.collisionHandle._set_begin(self.collsionBegin)
         #sprite
         self.image = tireSprite
         self.rect = self.image.get_rect()
@@ -43,17 +42,5 @@ class Tire(sprite.Sprite):
         pass
 
     def collsionBegin(self, arbiter, space, data):
-        
-        return True
-
-    def collisionPreSolve(self, arbiter, space, data):
         self.isColliding = True
-        return True
-
-    def collisionPostSovle(self, arbiter, space, data):
-        
-        return True
-
-    def collisionSeparate(self, arbiter, space, data):
-        self.isColliding = False
         return True

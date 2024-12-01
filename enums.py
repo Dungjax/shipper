@@ -1,9 +1,7 @@
 from enum import Enum
 
-
-
-class GameState(Enum):
-    def __init__(self) -> None:
-        super().__init__()
-
-        
+class ShapeType(Enum):
+    GROUND = 0
+    TIRE = 1
+    PLAYER = 2
+    OBSTACLE = 3

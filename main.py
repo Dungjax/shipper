@@ -4,7 +4,6 @@ from world import World
 
 display.init()
 
-
 class Game:
     def __init__(self) -> None:
         self.isRunning = True
@@ -33,12 +32,15 @@ class Game:
 
         self.world.update()
 
+        if self.world.bike.isDied:
+            self.isRunning = False
+
         space.step(self.deltaTime)
 
         pass
 
     def draw(self):
-        WINDOW.fill((0, 0, 0))
+        #WINDOW.fill((0, 0, 0))
         self.world.draw()
 
         #space.debug_draw(options)
