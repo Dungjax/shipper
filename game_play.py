@@ -1,22 +1,20 @@
-from pygame import sprite
+from pygame import sprite, MOUSEBUTTONUP
 from pymunk import Body, Poly, Vec2d, Transform
 from common import WIDTH, HEIGHT, WINDOW, space, drawText
 from bike import Bike
-from sprite_importer import importImage
+from sprite_importer import backgroundSprite
 from paralax_sprite import ParalaxSprite
 from obstacle import Obstacle
 from enums import ShapeType
 from random import randint
 
-background = importImage("assets/bg.png").convert()
-
-class World:
+class GamePlay:
     def __init__(self) -> None:
         #physics
         self.translation = Transform()
         self.translated = self.translation.translated(0, 0)
         #sprite
-        self.backGroudSprite = background
+        self.backGroudSprite = backgroundSprite
         self.paralaxSpries = sprite.LayeredUpdates()
         self.obstacleSprites = sprite.LayeredUpdates()
         
@@ -33,14 +31,22 @@ class World:
         #bike
         self.bikes = sprite.LayeredUpdates()
         self.bike = Bike(self.bikes, Vec2d(400, 400), space)
+        self.collision = {}
         pass
 
         ParalaxSprite(self.paralaxSpries, (self.bike.body.position.x + WIDTH, self.groundBody.position.y))
         Obstacle(self.obstacleSprites, Vec2d(WIDTH, 400), space)
 
-    def input(self, isPressed: bool):
-        self.bike.input(isPressed)
+    def handleEvent(self, events):
+        for ev in events:
+            if ev.type == MOUSEBUTTONUP:
+                self.bike.jump()
         pass
+
+        if len(self.collision) > 0:
+            return "main menu"
+        
+        return False
 
     def update(self):
         self.bikes.update(self.translated)
@@ -51,12 +57,15 @@ class World:
             ParalaxSprite(self.paralaxSpries, (self.bike.body.position.x + WIDTH, self.groundBody.position.y))
 
         if self.obstacleSprites.get_sprite(len(self.obstacleSprites) - 1).rect.left < self.bike.rect.left:
-            #if len(self.obstacleSprites) < 2:
-            for i in range(randint(1, 3)):
-                Obstacle(self.obstacleSprites, Vec2d(self.bike.body.position.x + WIDTH, 0), space)
+            [Obstacle(self.obstacleSprites, Vec2d(self.bike.body.position.x + WIDTH, 0), space) for i in range(randint(1, 3))]
+                
             #pass
 
         self.translated = self.translation.translated(self.bike.body.position.x - self.bike.fixedPosition.x, self.bike.body.position.y - self.bike.fixedPosition.y)
+
+        self.collision = sprite.groupcollide(self.bikes, self.obstacleSprites, False, False)
+
+        
         
         pass
     def draw(self):

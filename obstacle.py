@@ -8,27 +8,28 @@ from random import randint
 tireSprite = importImage("assets/tire.png").convert_alpha()
 
 class Obstacle(sprite.Sprite):
-    def __init__(self, _group: sprite.LayeredUpdates, _position, _space: Space) -> None:
+    def __init__(self, group: sprite.LayeredUpdates, position, space: Space) -> None:
         super().__init__()
         #sprite
         size = randint(30, 90)
         self.fixedImage = transform.scale(tireSprite, (size, size))
         self.image = self.fixedImage
         self.rect = self.image.get_rect()
-        self.fixedPosition = _position
-        self.rect.center = _position
+        self.fixedPosition = position
+        self.rect.center = position
 
-        _group.add(self)
+        group.add(self)
         #physics
+        self.space = space
         mass = 5
         self.body = Body(mass=mass, moment=450*mass, body_type=Body.DYNAMIC)
-        self.body.position = _position
+        self.body.position = position
         self.shape = Circle(self.body, self.image.get_width() // 2)
-        self.shape.elasticity = 0.25
+        self.shape.elasticity = 0.5
         self.shape.friction = 1
         self.shape.collision_type = ShapeType.OBSTACLE.value
 
-        _space.add(self.body, self.shape)
+        space.add(self.body, self.shape)
     
     def update(self, translated):
         self.image = transform.rotate(self.fixedImage, -degrees(self.body.angle))
@@ -37,5 +38,8 @@ class Obstacle(sprite.Sprite):
 
         if self.rect.right < 0:
             self.kill()
+            self.space.remove(self.body, self.shape)
+        
+        self.body._set_angular_velocity(-10)
 
         pass

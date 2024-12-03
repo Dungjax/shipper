@@ -16,3 +16,10 @@ def importSprite(_path):
 def importSpriteFromFolder(_path):
     for _, __, imagePaths in walk(_path):
         return [image.load(_path + "/" + imagePath).convert_alpha() for imagePath in imagePaths]
+    
+
+playButtonSprite = importImage("assets/play.png").convert_alpha()
+bikeSrpite = importImage("assets/bike_full.png").convert_alpha()
+tireSprite = importImage("assets/tire.png").convert_alpha()
+
+backgroundSprite = importImage("assets/bg.png").convert()
